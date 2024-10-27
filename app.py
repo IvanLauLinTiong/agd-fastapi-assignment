@@ -24,12 +24,14 @@ async def create_note(note: schemas.NoteCreate, db: db_dependency):
 
     db.commit()
     db.refresh(db_note)
+
     return db_note
 
 
 @app.get("/notes/", response_model=List[schemas.Note])
 async def get_notes(db: db_dependency):
     db_notes = crud.get_notes(db)
+
     return db_notes
 
 
@@ -38,6 +40,7 @@ async def get_note_by_id(note_id: int, db: db_dependency):
     db_note = crud.get_note_by_id(db, note_id)
     if not db_note:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
+
     return db_note
 
 
@@ -78,3 +81,25 @@ async def delete_note(note_id: int, db: db_dependency):
     crud.delete_orphaned_tags(db)
 
     return {"message": "Note deleted successfully"}
+
+@app.get("/tags", response_model=List[schemas.Tag])
+async def get_tags(db: db_dependency):
+    db_tags = crud.get_tags(db)
+
+    return db_tags
+
+@app.get("/tags/{tag_id}/notes", response_model=List[schemas.NoteWithoutTags])
+async def get_notes_by_tag_id(tag_id: int, db: db_dependency):
+    db_tag = crud.get_tag_by_id(db, tag_id)
+    if not db_tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+
+    return db_tag.notes
+
+@app.get("/tags/by-name/{tag_name}/notes", response_model=List[schemas.NoteWithoutTags])
+async def get_notes_by_tag_name(tag_name: str, db: db_dependency):
+    db_tag = crud.get_tag_by_name(db, tag_name)
+    if not db_tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+
+    return db_tag.notes

@@ -19,6 +19,9 @@ class NoteCreate(NoteBase):
 class NoteUpdate(NoteBase):
     tags: List[str] = []
 
+class NoteWithoutTags(NoteBase):
+    id: int
+
 class Note(NoteBase):
     id: int
     tags: List[Tag] = []

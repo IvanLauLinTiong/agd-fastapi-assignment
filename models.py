@@ -1,9 +1,16 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
+
+note_tags_association = Table(
+    "note_tags_association",
+    Base.metadata,
+    Column("note_id", Integer, ForeignKey("notes.id", ondelete="CASCADE")),
+    Column("tag_id", Integer, ForeignKey("tags.id", ondelete="CASCADE"))
+)
 
 class Notes(Base):
     __tablename__ = "notes"
@@ -11,7 +18,7 @@ class Notes(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
-    tags = relationship("Tags", back_populates="notes")
+    tags = relationship("Tags", secondary=note_tags_association, back_populates="notes")
 
 
 class Tags(Base):
@@ -19,6 +26,7 @@ class Tags(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
-    notes_id = Column(Integer, ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"))
-    notes = relationship("Notes", back_populates="tags")
+    # notes_id = Column(Integer, ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"))
+    # notes_id = Column(Integer, ForeignKey("notes.id", ondelete="CASCADE"))
+    notes = relationship("Notes", secondary=note_tags_association, back_populates="tags")
 
