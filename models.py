@@ -26,7 +26,5 @@ class Tags(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
-    # notes_id = Column(Integer, ForeignKey("notes.id", onupdate="CASCADE", ondelete="CASCADE"))
-    # notes_id = Column(Integer, ForeignKey("notes.id", ondelete="CASCADE"))
     notes = relationship("Notes", secondary=note_tags_association, back_populates="tags")
 
