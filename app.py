@@ -59,15 +59,22 @@ async def update_note(note_id: int, note: schemas.NoteUpdate,  db: db_dependency
 
     db.commit()
     db.refresh(db_note)
+
+    # Clean up orphaned tags
+    crud.delete_orphaned_tags(db)
+
     return db_note
 
 @app.delete("/notes/{note_id}")
 async def delete_note(note_id: int, db: db_dependency):
-    # Get exiting note if any
     db_note = crud.get_note_by_id(db, note_id)
     if not db_note:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Note not found")
 
     db.delete(db_note)
     db.commit()
+
+     # Clean up orphaned tags
+    crud.delete_orphaned_tags(db)
+
     return {"message": "Note deleted successfully"}

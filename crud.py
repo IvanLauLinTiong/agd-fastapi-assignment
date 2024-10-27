@@ -28,3 +28,10 @@ def get_or_create_tag(db: Session, tag: str):
         db.refresh(db_tag)
     return db_tag
 
+
+def delete_orphaned_tags(db: Session):
+    # Find tags with no associated notes
+    orphaned_tags = db.query(models.Tags).filter(~models.Tags.notes.has()).all()
+    for tag in orphaned_tags:
+        db.delete(tag)
+    db.commit()
