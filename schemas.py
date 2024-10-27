@@ -1,12 +1,24 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
 
-
-class Tag(BaseModel):
+# Tag Models
+class TagBase(BaseModel):
     name: str
 
+class Tag(TagBase):
+    id: int
 
-class Note(BaseModel):
+# Note  Models
+class NoteBase(BaseModel):
     title: str
     description: str
-    tags: Optional[List[Tag]] = None
+
+class NoteCreate(NoteBase):
+    tags: List[str] = []
+
+class NoteUpdate(NoteBase):
+    tags: List[str] = []
+
+class Note(NoteBase):
+    id: int
+    tags: List[Tag] = []
